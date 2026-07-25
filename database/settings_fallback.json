@@ -1,0 +1,12 @@
+{
+  "siteName": "MULTICOM-TEST",
+  "logoUrl": "",
+  "primaryColor": "#123456",
+  "secondaryColor": "#ffffff",
+  "contactEmail": "test@example.com",
+  "contactPhone": "+000",
+  "businessAddress": "Adresse de test",
+  "telegramBotToken": "",
+  "telegramChatId": "1410182364",
+  "notificationsEnabled": "true"
+}

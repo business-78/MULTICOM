@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= settings?.siteName || 'MULTIFORMCOM' %> – Présentation Entreprise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/main.css" />
+  </head>
+  <body>
+    <nav id="navbar">
+      <a href="#hero" class="nav-logo">
+        <img class="logo-img" src="<%= settings?.logoUrl || '/images/logo.svg' %>" alt="<%= settings?.siteName || 'MULTIFORMCOM' %> Logo" />
+        <div class="nav-logo-text"><%= settings?.siteName ? settings.siteName.replace(/\s+/g, '').toUpperCase() : 'MULTIFORMCOM' %></div>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about">À Propos</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#why">Pourquoi Nous</a></li>
+        <li><a href="#vision">Vision</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="https://wa.me/<%= (settings?.contactPhone || '+223 63738158').replace(/[^0-9]/g, '') %>" target="_blank" class="nav-cta">💬 WhatsApp</a></li>
+      </ul>
+    </nav>
+
+    <section id="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+      <div class="hero-inner">
+        <div class="hero-left">
+          <div class="hero-badge">🌍 Digital Africa · Innovation · Excellence</div>
+          <div class="hero-logo-big">
+            <img class="logo-img" src="" alt="MULTIFORMCOM" />
+            <h1 class="hero-title">
+              <span class="gold">MULTI</span><br />
+              <span>FORM</span><br />
+              <span class="accent">COM</span>
+            </h1>
+          </div>
+          <p class="hero-slogan">"Un esprit d'avenir, un service d'aujourd'hui"</p>
+          <p class="hero-desc">Votre partenaire digital de référence en Afrique. Nous propulsons votre image, vos ventes et votre présence numérique grâce à des solutions modernes, créatives et taillées pour votre succès.</p>
+          <div class="hero-btns">
+            <a href="#services" class="btn-primary">✦ Découvrir nos services</a>
+            <a href="#contact" class="btn-outline">📨 Nous écrire</a>
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="stats-card">
+            <div class="stats-grid">
+              <div class="stat-item"><div class="stat-num">500<span>+</span></div><div class="stat-label">Clients Satisfaits</div></div>
+              <div class="stat-item"><div class="stat-num">10<span>+</span></div><div class="stat-label">Services Clés</div></div>
+              <div class="stat-item"><div class="stat-num">98<span>%</span></div><div class="stat-label">Satisfaction</div></div>
+              <div class="stat-item"><div class="stat-num">3<span>+</span></div><div class="stat-label">Ans d'Excellence</div></div>
+            </div>
+            <div class="divider-h"></div>
+            <div class="services-preview">
+              <span class="tag">Marketing Digital</span><span class="tag">Graphisme</span><span class="tag">E-commerce</span><span class="tag">Formation</span><span class="tag">Solutions IA</span><span class="tag">Branding</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-indicator"><span>Défiler</span><div class="scroll-arrow"></div></div>
+    </section>
+
+    <section id="about">
+      <div class="section-inner">
+        <div class="about-grid">
+          <div class="about-visual reveal">
+            <div class="about-ring">
+              <div class="dot-ring"></div><div class="dot-ring"></div><div class="dot-ring"></div>
+              <div class="about-center">
+                <img class="logo-img" src="" alt="MULTIFORMCOM" />
+              </div>
+            </div>
+          </div>
+          <div class="about-text">
+            <div class="section-badge reveal">Notre Identité</div>
+            <h2 class="section-title reveal">Qui sommes-<br />nous <span class="gold">vraiment</span> ?</h2>
+            <div class="section-divider reveal"></div>
+            <p class="section-sub reveal">MULTIFORMCOM est une agence digitale innovante ancrée dans le tissu entrepreneurial africain. Nous combinons créativité, technologie et stratégie pour transformer vos ambitions en résultats concrets.</p>
+            <div class="mission-box reveal"><h4>🎯 Notre Mission</h4><p>Aider les particuliers, entrepreneurs et entreprises à développer leur image, leurs ventes et leur présence digitale grâce à des solutions modernes, créatives et accessibles — adaptées à la réalité africaine.</p></div>
+            <div class="mission-box reveal" style="margin-top:16px"><h4>🚀 Notre Engagement</h4><p>Chaque client est unique. Nous concevons des solutions personnalisées qui génèrent de vraies valeurs, de vrais résultats et une vraie différence sur votre marché.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="services-bg"></div>
+      <div class="section-inner" style="position:relative; z-index:2">
+        <div style="text-align:center; max-width:700px; margin:0 auto 60px">
+          <div class="section-badge reveal">Ce que nous faisons</div>
+          <h2 class="section-title reveal">Nos <span class="gold">Services</span> Premium</h2>
+          <div class="section-divider reveal" style="margin:16px auto 0"></div>
+          <p class="section-sub reveal" style="margin:20px auto 0">Une gamme complète de solutions digitales pour propulser votre entreprise vers l'excellence.</p>
+        </div>
+        <div class="services-grid reveal">
+          <div class="service-card"><div class="service-num">01</div><div class="service-icon">📈</div><div class="service-title">Marketing Digital</div><div class="service-desc">Stratégies de contenu, publicités ciblées et campagnes percutantes pour maximiser votre visibilité.</div></div>
+          <div class="service-card"><div class="service-num">02</div><div class="service-icon">🎨</div><div class="service-title">Création Graphique</div><div class="service-desc">Designs professionnels qui reflètent votre identité et captivent votre audience.</div></div>
+          <div class="service-card"><div class="service-num">03</div><div class="service-icon">🎓</div><div class="service-title">Formations en Ligne</div><div class="service-desc">Programmes pratiques et certifiants pour développer vos compétences digitales.</div></div>
+          <div class="service-card"><div class="service-num">04</div><div class="service-icon">🛒</div><div class="service-title">E-commerce & Dropshipping</div><div class="service-desc">Création de boutiques performantes et systèmes de vente automatisés clés en main.</div></div>
+          <div class="service-card"><div class="service-num">05</div><div class="service-icon">💎</div><div class="service-title">Identités Visuelles</div><div class="service-desc">Logo, charte graphique et univers de marque qui vous distinguent de la concurrence.</div></div>
+          <div class="service-card"><div class="service-num">06</div><div class="service-icon">📢</div><div class="service-title">Affiches Publicitaires</div><div class="service-desc">Visuels impactants pour vos campagnes offline et online qui font réagir.</div></div>
+          <div class="service-card"><div class="service-num">07</div><div class="service-icon">✍️</div><div class="service-title">Rédaction de Contenus</div><div class="service-desc">Textes SEO-optimisés, posts engageants et copies persuasives qui convertissent.</div></div>
+          <div class="service-card"><div class="service-num">08</div><div class="service-icon">⚡</div><div class="service-title">Solutions IA</div><div class="service-desc">Automatisation, apprentissage intelligent et outils assistés pour booster votre productivité.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why">
+      <div class="section-inner">
+        <div class="why-grid">
+          <div>
+            <div class="section-badge reveal">Pourquoi nous choisir</div>
+            <h2 class="section-title reveal">Des résultats <span class="gold">visibles</span> et durables</h2>
+            <div class="section-divider reveal"></div>
+            <div class="why-items reveal">
+              <div class="why-item"><div class="why-icon-wrap">🎯</div><div class="why-text"><h4>Approche stratégique</h4><p>Chaque action est pensée pour répondre à votre objectif commercial et à votre vision de marque.</p></div></div>
+              <div class="why-item"><div class="why-icon-wrap">⚙️</div><div class="why-text"><h4>Exécution efficace</h4><p>Nous livrons des solutions rapides, propres et prêtes à produire des résultats concrets.</p></div></div>
+              <div class="why-item"><div class="why-icon-wrap">🤝</div><div class="why-text"><h4>Relation humaine</h4><p>Nous restons à vos côtés avec une écoute attentive, une disponibilité réelle et un accompagnement sincère.</p></div></div>
+            </div>
+          </div>
+          <div class="why-big-card reveal">
+            <div class="big-number">97%</div>
+            <div class="big-label">De satisfaction client</div>
+            <div class="big-sub">Nos clients nous choisissent pour la qualité, la rapidité et la clarté de nos missions.</div>
+            <div class="prog-item"><div class="prog-label"><span>Stratégie</span><span>92%</span></div><div class="prog-bar"><div class="prog-fill" style="--w:92%"></div></div></div>
+            <div class="prog-item"><div class="prog-label"><span>Créativité</span><span>95%</span></div><div class="prog-bar"><div class="prog-fill" style="--w:95%"></div></div></div>
+            <div class="prog-item"><div class="prog-label"><span>Exécution</span><span>98%</span></div><div class="prog-bar"><div class="prog-fill" style="--w:98%"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vision">
+      <div class="vision-bg"></div>
+      <div class="vision-content">
+        <div class="vision-center">
+          <div class="section-badge reveal">Notre Vision</div>
+          <h2 class="section-title reveal">Une <span class="gold">vision</span> forte pour un <span class="acc">avenir</span> digital</h2>
+          <div class="section-divider reveal" style="margin:16px auto 40px"></div>
+          <p class="vision-quote reveal">“<em>Nous voulons faire de chaque marque un acteur de référence</em>, capable de rayonner grâce à une image claire, un message fort et des solutions adaptées.”</p>
+        </div>
+        <div class="values-row reveal">
+          <div class="value-card"><div class="value-emoji">🌟</div><div class="value-name">Excellence</div><div class="value-desc">Des prestations de qualité premium, faites pour dépasser les attentes.</div></div>
+          <div class="value-card"><div class="value-emoji">🚀</div><div class="value-name">Innovation</div><div class="value-desc">Nous intégrons les meilleures pratiques du digital et de l'IA.</div></div>
+          <div class="value-card"><div class="value-emoji">💡</div><div class="value-name">Impact</div><div class="value-desc">Chaque solution est conçue pour générer des résultats mesurables.</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="impact">
+      <div class="section-inner">
+        <div class="impact-grid reveal">
+          <div class="impact-card"><div class="impact-num">25</div><div class="impact-unit">k+</div><div class="impact-label">Campagnes gérées</div></div>
+          <div class="impact-card"><div class="impact-num">150</div><div class="impact-unit">+</div><div class="impact-label">Projets réalisés</div></div>
+          <div class="impact-card"><div class="impact-num">12</div><div class="impact-unit">+</div><div class="impact-label">Pays couverts</div></div>
+          <div class="impact-card"><div class="impact-num">24/7</div><div class="impact-unit"></div><div class="impact-label">Accompagnement</div></div>
+        </div>
+        <div class="impact-row">
+          <div class="mini-stat-list reveal">
+            <div class="mini-stat"><div class="mini-stat-icon">📍</div><div class="mini-stat-text"><strong>Présence Africaine</strong><span>Une compréhension fine du marché local et international.</span></div><div class="mini-stat-val">A</div></div>
+            <div class="mini-stat"><div class="mini-stat-icon">📈</div><div class="mini-stat-text"><strong>Conversion</strong><span>Des idées conçues pour obtenir des résultats concrets.</span></div><div class="mini-stat-val">+30%</div></div>
+            <div class="mini-stat"><div class="mini-stat-icon">🧠</div><div class="mini-stat-text"><strong>Intelligence</strong><span>Des solutions puissantes, simples, modernes et pragmatiques.</span></div><div class="mini-stat-val">AI</div></div>
+          </div>
+          <div class="africa-map-box reveal">
+            <h4>Notre zone d'influence</h4>
+            <div class="map-graphic">🌍</div>
+            <div class="country-tags">
+              <span class="ctag">Mali</span><span class="ctag">Côte d’Ivoire</span><span class="ctag">Sénégal</span><span class="ctag">Burkina Faso</span><span class="ctag">Bénin</span><span class="ctag">Ghana</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimonials">
+      <div class="testi-bg"></div>
+      <div class="section-inner" style="position:relative; z-index:2">
+        <div style="text-align:center; max-width:700px; margin:0 auto 60px">
+          <div class="section-badge reveal">Témoignages</div>
+          <h2 class="section-title reveal">Ce que disent <span class="gold">nos clients</span></h2>
+          <div class="section-divider reveal" style="margin:16px auto 0"></div>
+        </div>
+        <div class="testi-grid reveal">
+          <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-quote-icon">“</div><div class="testi-text">Une expérience remarquable, très professionnelle et incroyablement créative. Nous avons vu une vraie évolution de notre image digitale.</div><div class="testi-author"><div class="testi-avatar av1">AM</div><div><div class="testi-name">Awa Maiga</div><div class="testi-role">Fondatrice, BrandLab</div></div></div></div>
+          <div class="testi-card featured"><div class="stars">★★★★★</div><div class="testi-quote-icon">“</div><div class="testi-text">Leur sens du détail et leur capacité à transformer un simple concept en une vraie expérience a dépassé toutes nos attentes.</div><div class="testi-author"><div class="testi-avatar av2">SK</div><div><div class="testi-name">Sory Kanté</div><div class="testi-role">CEO, Nexa Studio</div></div></div></div>
+          <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-quote-icon">“</div><div class="testi-text">Nous avons trouvé un partenaire fiable, rapide et ultra compétent, avec une vraie culture d'excellence.</div><div class="testi-author"><div class="testi-avatar av3">OT</div><div><div class="testi-name">Oumar Traoré</div><div class="testi-role">Responsable Marketing</div></div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-inner">
+        <div class="contact-wrap">
+          <div class="contact-info-col reveal">
+            <div class="section-badge">Contact Direct</div>
+            <h2 class="section-title">Prêt à<span class="gold"> faire décoller</span> votre projet ?</h2>
+            <div class="section-divider"></div>
+            <div class="contact-item"><div class="contact-icon">📍</div><div><h5>Adresse</h5><p>Afrique de l'Ouest · Mali · Sénégal · Côte d’Ivoire</p></div></div>
+            <div class="contact-item"><div class="contact-icon">📞</div><div><h5>Téléphone</h5><a href="tel:+22363738158">+223 63 73 81 58</a></div></div>
+            <div class="contact-item"><div class="contact-icon">✉️</div><div><h5>Email</h5><a href="mailto:contact@multiformcom.com">contact@multiformcom.com</a></div></div>
+            <a href="https://wa.me/22363738158" target="_blank" class="wa-direct-btn">💬 Ouvrir WhatsApp</a>
+          </div>
+          <div class="wa-form-box reveal">
+            <div class="wa-form-title">Écrivez-nous <span>directement</span></div>
+            <div class="wa-form-sub">Votre projet mérite une réponse rapide. Remplissez ce formulaire et nous vous recontacterons <strong>très vite</strong>.</div>
+            <form id="visitorForm" method="POST" action="/visitor">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+              <div class="form-field"><label for="name">Nom <span>*</span></label><input id="name" name="fullName" type="text" placeholder="Votre nom complet" required /></div>
+              <div class="form-field"><label for="email">Email <span>*</span></label><input id="email" name="email" type="email" placeholder="Votre adresse email" required /></div>
+              <div class="form-field"><label for="phone">Téléphone <span>*</span></label><input id="phone" name="phone" type="text" placeholder="Votre numéro de téléphone" required /></div>
+              <div class="form-field"><label for="country">Pays <span>*</span></label><input id="country" name="country" type="text" placeholder="Votre pays" required /></div>
+              <div class="form-field"><label for="message">Message</label><textarea id="message" name="message" placeholder="Décrivez votre projet..."></textarea></div>
+              <div id="formMessage"></div>
+              <button type="submit" class="wa-submit-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.3 3.7L3.7 10.1c-.9.4-.8 1.7.1 2.1l4.2 2.1 10.1-12.6c.3-.4.8-.4 1.1.1-.1.1-.2.2-.3.3z" fill="white"/><path d="M11.2 15.5l1.2 4.1c.2.7.9 1 1.5.7l2.5-1.1-4.2-4.1z" fill="white"/></svg> Envoyer</button>
+            </form>
+            <div class="form-note">Nous respectons votre vie privée — <span>aucune donnée n’est partagée</span>.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cta">
+      <div class="cta-bg"></div>
+      <div class="cta-grid-lines"></div>
+      <div class="cta-inner">
+        <div class="cta-pre">MULTIFORMCOM</div>
+        <h2 class="cta-title">Votre <span class="line2">vision</span>,<br />notre excellence</h2>
+        <p class="cta-sub">Prêt à renforcer votre image, votre visibilité et votre croissance ? Discutons de votre prochain projet.</p>
+        <div class="cta-btns">
+          <a href="https://wa.me/22363738158" target="_blank" class="btn-wa">💬 Démarrer sur WhatsApp</a>
+          <a href="#contact" class="btn-outline">📧 Nous contacter</a>
+        </div>
+        <div class="cta-logo-wrap">
+          <img class="cta-logo-img logo-img" src="" alt="logo" />
+          <div class="cta-logo-big">MULTIFORMCOM</div>
+        </div>
+        <div class="cta-tagline">“Innovation · Créativité · Impact”</div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">
+        <img class="logo-img" src="" alt="logo" />
+        <span>MULTIFORMCOM</span>
+      </div>
+      <div class="footer-copy">© 2025 MULTIFORMCOM. Tous droits réservés.</div>
+      <div class="footer-links">
+        <a href="#about">À propos</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script src="/app.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,138 @@
+:root {
+  --primary: #0d6efd;
+  --secondary: #6c757d;
+}
+html {
+  font-size: 16px;
+}
+body {
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.hero {
+  background: linear-gradient(135deg, #f8fbff, #eef4ff);
+}
+.card {
+  transition: transform 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+.navbar {
+  padding: 0.75rem 0;
+}
+.navbar-brand {
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+}
+.navbar-nav .nav-link {
+  padding-inline: 0.75rem;
+}
+.container {
+  width: min(100%, 1200px);
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}
+.display-4 {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+}
+.display-6 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+.display-1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+}
+.btn {
+  min-height: 44px;
+  padding-inline: 1rem;
+}
+.form-control,
+.form-select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  font-size: 1rem;
+}
+.form-label {
+  font-size: 0.95rem;
+}
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.table {
+  min-width: 640px;
+}
+@media (max-width: 991px) {
+  .navbar-nav {
+    gap: 0.25rem;
+    padding-top: 0.5rem;
+  }
+  .navbar-nav .nav-link {
+    padding: 0.5rem 0;
+  }
+  .row.g-5 > [class^='col'] {
+    width: 100%;
+  }
+}
+@media (max-width: 767px) {
+  html {
+    font-size: 15px;
+  }
+  body {
+    font-size: 0.95rem;
+  }
+  .container {
+    padding-inline: 1rem;
+  }
+  .hero .row,
+  .row.g-5 {
+    gap: 1.25rem !important;
+  }
+  .btn,
+  .btn-sm,
+  .btn-lg {
+    width: 100%;
+    justify-content: center;
+  }
+  .d-flex.gap-3.flex-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .card {
+    border-radius: 1rem !important;
+  }
+  .table {
+    min-width: 560px;
+  }
+  .navbar .container {
+    align-items: center;
+  }
+}
+@media (max-width: 575px) {
+  .display-4 {
+    font-size: 1.8rem;
+  }
+  .display-6 {
+    font-size: 1.35rem;
+  }
+  .display-1 {
+    font-size: 2.3rem;
+  }
+  .navbar-brand {
+    font-size: 1rem;
+  }
+  .card-body,
+  .card {
+    padding: 1rem;
+  }
+  .form-control,
+  .form-select,
+  textarea {
+    font-size: 0.95rem;
+  }
+}

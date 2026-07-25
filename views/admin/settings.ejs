@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">MULTICOM</a>
+        <div class="ms-auto d-flex align-items-center flex-wrap gap-2">
+          <a class="btn btn-outline-light btn-sm" href="/admin/dashboard">Retour</a>
+          <a class="btn btn-outline-light btn-sm" href="/admin/logout">Déconnexion</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <div class="mb-4">
+        <h2 class="fw-bold mb-1">Paramètres du site</h2>
+        <p class="text-muted mb-0">Modifiez les informations affichées publiquement et la configuration Telegram.</p>
+      </div>
+
+      <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger"><%= error %></div>
+      <% } %>
+      <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success"><%= success %></div>
+      <% } %>
+
+      <form method="POST" action="/admin/settings" class="row g-3">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Nom du site</label>
+          <input class="form-control" name="siteName" value="<%= settings.siteName %>" required />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Logo URL</label>
+          <input class="form-control" name="logoUrl" value="<%= settings.logoUrl %>" placeholder="https://..." />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Couleur principale</label>
+          <input class="form-control" type="color" name="primaryColor" value="<%= settings.primaryColor %>" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Couleur secondaire</label>
+          <input class="form-control" type="color" name="secondaryColor" value="<%= settings.secondaryColor %>" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Adresse e-mail de contact</label>
+          <input class="form-control" type="email" name="contactEmail" value="<%= settings.contactEmail %>" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Numéro de téléphone</label>
+          <input class="form-control" name="contactPhone" value="<%= settings.contactPhone %>" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Adresse de l'entreprise</label>
+          <textarea class="form-control" name="businessAddress" rows="2"><%= settings.businessAddress %></textarea>
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Bot Token Telegram</label>
+          <input class="form-control" name="telegramBotToken" value="<%= settings.telegramBotToken %>" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Chat ID Telegram</label>
+          <input class="form-control" name="telegramChatId" value="<%= settings.telegramChatId %>" />
+        </div>
+
+        <div class="col-12">
+          <div class="form-check form-switch mt-2">
+            <input class="form-check-input" type="checkbox" id="notifEnabled" name="notificationsEnabled" <%= (settings.notificationsEnabled === 'true') ? 'checked' : '' %> />
+            <label class="form-check-label" for="notifEnabled">Activer les notifications Telegram</label>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <button class="btn btn-primary">Enregistrer les paramètres</button>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

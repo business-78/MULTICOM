@@ -1,0 +1,131 @@
+Database initial connection failed: connect ECONNREFUSED 127.0.0.1:3306
+Démarrage du serveur Express
+Serveur démarré sur http://localhost:3000
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: Test User
+Telegram non configuré.
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: Test User
+Telegram non configuré.
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: Test User
+Telegram non configuré.
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: Test User
+Telegram non configuré.
+Connexion admin réussie par admin
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: adama
+Telegram non configuré.
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: adama
+Telegram non configuré.
+Connexion admin réussie par admin
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+deleteVisitor impossible: database unavailable.
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+deleteVisitor impossible: database unavailable.
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+deleteVisitor impossible: database unavailable.
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: adama
+Telegram non configuré.
+createVisitor fallback: database unavailable, sauvegarde locale utilisée.
+Nouveau visiteur enregistré: adama
+Telegram non configuré.
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
+Connexion admin réussie par admin
+Render dashboard start
+getVisitorStats fallback: database unavailable, statistiques locales utilisées.
+findVisitors fallback: database unavailable, lecture locale utilisée.
+Dashboard stats error: TypeError: (intermediate value).slice is not a function
+    at getVisitorStats (C:\MULTICOM\models\visitorModel.js:126:30)
+    at renderDashboard (C:\MULTICOM\controllers\adminController.js:105:7)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at ensureAdminSession (C:\MULTICOM\controllers\adminController.js:41:12)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at next (C:\MULTICOM\node_modules\express\lib\router\route.js:149:13)
+    at Route.dispatch (C:\MULTICOM\node_modules\express\lib\router\route.js:119:3)
+    at Layer.handle [as handle_request] (C:\MULTICOM\node_modules\express\lib\router\layer.js:95:5)
+    at C:\MULTICOM\node_modules\express\lib\router\index.js:284:15
