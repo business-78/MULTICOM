@@ -49,6 +49,14 @@ async function createVisitor(data) {
 
   if (!pool || !isDbAvailable()) {
     const fallback = readFallbackVisitors();
+    try {
+      // check fallback for recent duplicate (10s window)
+      const recent = fallback.find((v) => v.email === email && v.phone === phone && v.ip_address === ip_address && Math.abs(new Date().getTime() - new Date(v.created_at).getTime()) < 10000);
+      if (recent) return recent.id;
+    } catch (err) {
+      // ignore fallback dedupe errors
+    }
+
     const newVisitor = {
       id: fallback.length ? fallback[fallback.length - 1].id + 1 : 1,
       full_name,
@@ -68,6 +76,18 @@ async function createVisitor(data) {
   }
 
   if (isPostgres()) {
+    try {
+      // Basic deduplication: if an identical visitor (email+phone+ip) was recorded very recently, return existing id
+      const dupCheck = await pool.query(
+        `SELECT id FROM visitors WHERE email = $1 AND phone = $2 AND ip_address = $3 AND visited_at >= NOW() - INTERVAL '10 seconds' LIMIT 1`,
+        [email, phone, ip_address]
+      );
+      if (dupCheck.rows && dupCheck.rows.length) {
+        return dupCheck.rows[0].id;
+      }
+    } catch (err) {
+      // ignore dedupe errors and continue to insert
+    }
     const result = await pool.query(
       `INSERT INTO visitors (full_name, email, phone, country, visited_at, ip_address, browser, os)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
@@ -75,7 +95,18 @@ async function createVisitor(data) {
     );
     return result.rows[0].id;
   }
-
+  try {
+    // MySQL dedupe fallback
+    const [existing] = await pool.execute(
+      `SELECT id FROM visitors WHERE email = ? AND phone = ? AND ip_address = ? AND visited_at >= DATE_SUB(NOW(), INTERVAL 10 SECOND) LIMIT 1`,
+      [email, phone, ip_address]
+    );
+    if (Array.isArray(existing) && existing.length) {
+      return existing[0].id;
+    }
+  } catch (err) {
+    // ignore and continue
+  }
   const [result] = await pool.execute(
     `INSERT INTO visitors (full_name, email, phone, country, visited_at, ip_address, browser, os)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
