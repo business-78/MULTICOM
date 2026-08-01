@@ -1,12 +1,12 @@
 {
-  "siteName": "MULTICOM-TEST",
+  "siteName": "MULTIFORMCOM",
   "logoUrl": "",
-  "primaryColor": "#123456",
+  "primaryColor": "#5542b3",
   "secondaryColor": "#ffffff",
-  "contactEmail": "test@example.com",
-  "contactPhone": "+000",
-  "businessAddress": "Adresse de test",
-  "telegramBotToken": "",
+  "contactEmail": "contact@multiformcom.com",
+  "contactPhone": "+223 63 73 81 58",
+  "businessAddress": "Afrique de l'Ouest · Mali · Sénégal · Côte d’Ivoire",
+  "telegramBotToken": "8906877775:AAHcwb9cLGwHufdWVd-4P8xlfr6NvyCU29w",
   "telegramChatId": "1410182364",
   "notificationsEnabled": "true"
 }

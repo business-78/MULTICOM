@@ -26,7 +26,8 @@ async function sendTelegramMessage(data) {
     return false;
   }
 
-  const message = `Nouveau visiteur\nNom: ${data.fullName}\nTéléphone: ${data.phone}\nEmail: ${data.email}\nPays: ${data.country}\nDate: ${data.visitedAt}\nIP: ${data.ip}`;
+  const messageText = String(data.message || data.country || '').trim();
+  const message = `Nouveau visiteur\n👤 Nom et prénom: ${data.fullName}\n📱 Numéro WhatsApp: ${data.phone}\n💬 Demande / Message: ${messageText}\n📅 Date: ${data.visitedAt}\nIP: ${data.ip}`;
 
   const payload = JSON.stringify({ chat_id: chatId, text: message });
   const options = {

@@ -2,9 +2,18 @@
 // Configuration et initialisation de la base de données avec support MySQL ou PostgreSQL.
 const mysql = require('mysql2/promise');
 const { Pool } = require('pg');
+const dns = require('dns');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
+
+try {
+  if (typeof dns.setDefaultResultOrder === 'function') {
+    dns.setDefaultResultOrder('ipv4first');
+  }
+} catch (error) {
+  // Node version may not support dns.setDefaultResultOrder; ignore and continue.
+}
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
@@ -13,7 +22,11 @@ let pool;
 let dbAvailable = false;
 
 if (databaseUrl) {
-  pool = new Pool({ connectionString: databaseUrl, ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false });
+  pool = new Pool({
+    connectionString: databaseUrl,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    family: 4
+  });
 } else {
   const mysqlHost = (process.env.DB_HOST || '127.0.0.1').trim();
   pool = mysql.createPool({

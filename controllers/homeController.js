@@ -17,12 +17,13 @@ async function renderHome(req, res) {
 
 async function submitVisitor(req, res) {
   try {
-    const { fullName, email, phone, country } = req.body;
+    const { fullName, email, phone, country, message } = req.body;
+    const requestText = String(country || message || '').trim();
     const normalized = {
       fullName: String(fullName || '').trim(),
       email: String(email || '').trim().toLowerCase(),
       phone: String(phone || '').trim(),
-      country: String(country || '').trim()
+      country: requestText
     };
 
     const errors = validateVisitorInput(normalized);
@@ -32,7 +33,7 @@ async function submitVisitor(req, res) {
 
     const clientInfo = getClientInfo(req);
     const visitedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    await createVisitor({
+    const visitorResult = await createVisitor({
       full_name: normalized.fullName,
       email: normalized.email,
       phone: normalized.phone,
@@ -43,13 +44,17 @@ async function submitVisitor(req, res) {
       os: clientInfo.os
     });
 
+    if (visitorResult.isDuplicate) {
+      logEvent(`Doublon visiteur détecté : ${normalized.fullName}`);
+      return res.json({ success: true, message: 'Votre visite a bien été enregistrée.' });
+    }
+
     logEvent(`Nouveau visiteur enregistré: ${normalized.fullName}`);
     try {
       await sendTelegramMessage({
         fullName: normalized.fullName,
         phone: normalized.phone,
-        email: normalized.email,
-        country: normalized.country,
+        message: normalized.country,
         visitedAt,
         ip: clientInfo.ip
       });

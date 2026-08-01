@@ -17,7 +17,9 @@ const allowedKeys = [
   'businessAddress',
   'telegramBotToken',
   'telegramChatId',
-  'notificationsEnabled'
+  'notificationsEnabled',
+  'adminUsername',
+  'adminPasswordHash'
 ];
 
 let settingsCache = {
@@ -30,7 +32,9 @@ let settingsCache = {
   businessAddress: process.env.BUSINESS_ADDRESS || 'Afrique de l\'Ouest · Mali · Sénégal · Côte d’Ivoire',
   telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
   telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
-  notificationsEnabled: process.env.NOTIFICATIONS_ENABLED || 'true'
+  notificationsEnabled: process.env.NOTIFICATIONS_ENABLED || 'true',
+  adminUsername: process.env.ADMIN_USERNAME?.trim() || 'admin',
+  adminPasswordHash: process.env.ADMIN_HASH?.trim() || ''
 };
 
 function isPostgres() {
@@ -107,6 +111,8 @@ async function loadSiteSettings() {
   settings.telegramBotToken = getEnvValue('TELEGRAM_BOT_TOKEN') || settings.telegramBotToken || '';
   settings.telegramChatId = getEnvValue('TELEGRAM_CHAT_ID') || settings.telegramChatId || '';
   settings.notificationsEnabled = getEnvValue('NOTIFICATIONS_ENABLED') || settings.notificationsEnabled || 'true';
+  settings.adminUsername = getEnvValue('ADMIN_USERNAME') || settings.adminUsername || 'admin';
+  settings.adminPasswordHash = getEnvValue('ADMIN_HASH') || settings.adminPasswordHash || '';
 
   if (!settings.telegramBotToken || !settings.telegramChatId) {
     logError(`loadSiteSettings warning: telegram config incomplete. tokenSet=${Boolean(settings.telegramBotToken)} chatIdSet=${Boolean(settings.telegramChatId)} notificationsEnabled=${settings.notificationsEnabled}`);

@@ -7,11 +7,12 @@ const { logEvent, logError } = require('../config/logger');
 
 router.post('/visitors', async (req, res) => {
   try {
+    const requestText = String(req.body.country || req.body.message || '').trim();
     const normalized = {
       fullName: String(req.body.fullName || '').trim(),
       email: String(req.body.email || '').trim().toLowerCase(),
       phone: String(req.body.phone || '').trim(),
-      country: String(req.body.country || '').trim()
+      country: requestText
     };
 
     const errors = validateVisitorInput(normalized);
@@ -21,7 +22,7 @@ router.post('/visitors', async (req, res) => {
 
     const clientInfo = getClientInfo(req);
     const visitedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    await createVisitor({
+    const visitorResult = await createVisitor({
       full_name: normalized.fullName,
       email: normalized.email,
       phone: normalized.phone,
@@ -32,12 +33,16 @@ router.post('/visitors', async (req, res) => {
       os: clientInfo.os
     });
 
+    if (visitorResult.isDuplicate) {
+      logEvent(`API visitor duplicate detected: ${normalized.fullName}`);
+      return res.status(200).json({ success: true, message: 'Visiteur déjà enregistré récemment.' });
+    }
+
     logEvent(`API visitor created: ${normalized.fullName}`);
     await sendTelegramMessage({
       fullName: normalized.fullName,
       phone: normalized.phone,
-      email: normalized.email,
-      country: normalized.country,
+      message: normalized.country,
       visitedAt,
       ip: clientInfo.ip
     }).catch((error) => logError(`Telegram error: ${error.message}`));

@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const { loadSiteSettings, getSiteSettings, saveSiteSettings } = require('../models/settingsModel');
 const { logEvent, logError } = require('../config/logger');
 
@@ -26,6 +27,18 @@ async function renderSettings(req, res) {
 async function updateSettings(req, res) {
   try {
     logEvent('Update settings start');
+    const currentSettings = await loadSiteSettings();
+    const adminUsername = String(req.body.adminUsername || currentSettings.adminUsername || 'admin').trim();
+    if (!adminUsername) {
+      return res.render('admin/settings', {
+        title: 'Paramètres du site',
+        settings: currentSettings,
+        error: 'L’identifiant administrateur est requis.',
+        success: null,
+        csrfToken: req.csrfToken ? req.csrfToken() : ''
+      });
+    }
+
     const updates = {
       siteName: req.body.siteName,
       logoUrl: req.body.logoUrl,
@@ -36,8 +49,33 @@ async function updateSettings(req, res) {
       businessAddress: req.body.businessAddress,
       telegramBotToken: req.body.telegramBotToken,
       telegramChatId: req.body.telegramChatId,
-      notificationsEnabled: req.body.notificationsEnabled
+      notificationsEnabled: req.body.notificationsEnabled,
+      adminUsername
     };
+
+    const newPassword = String(req.body.adminPassword || '').trim();
+    const confirmPassword = String(req.body.adminPasswordConfirm || '').trim();
+    if (newPassword) {
+      if (newPassword !== confirmPassword) {
+        return res.render('admin/settings', {
+          title: 'Paramètres du site',
+          settings: currentSettings,
+          error: 'Les mots de passe administrateur ne correspondent pas.',
+          success: null,
+          csrfToken: req.csrfToken ? req.csrfToken() : ''
+        });
+      }
+      if (newPassword.length < 8) {
+        return res.render('admin/settings', {
+          title: 'Paramètres du site',
+          settings: currentSettings,
+          error: 'Le mot de passe administrateur doit contenir au moins 8 caractères.',
+          success: null,
+          csrfToken: req.csrfToken ? req.csrfToken() : ''
+        });
+      }
+      updates.adminPasswordHash = await bcrypt.hash(newPassword, 10);
+    }
 
     const settings = await saveSiteSettings(updates);
     logEvent('Paramètres du site mis à jour.');

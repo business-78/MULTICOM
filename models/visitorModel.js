@@ -51,8 +51,12 @@ async function createVisitor(data) {
     const fallback = readFallbackVisitors();
     try {
       // check fallback for recent duplicate (10s window)
-      const recent = fallback.find((v) => v.email === email && v.phone === phone && v.ip_address === ip_address && Math.abs(new Date().getTime() - new Date(v.created_at).getTime()) < 10000);
-      if (recent) return recent.id;
+      const recent = fallback.find(
+        (v) => v.email === email && v.phone === phone && v.ip_address === ip_address && Math.abs(new Date().getTime() - new Date(v.created_at).getTime()) < 10000
+      );
+      if (recent) {
+        return { id: recent.id, isDuplicate: true };
+      }
     } catch (err) {
       // ignore fallback dedupe errors
     }
@@ -72,7 +76,7 @@ async function createVisitor(data) {
     fallback.push(newVisitor);
     writeFallbackVisitors(fallback);
     logError('createVisitor fallback: database unavailable, sauvegarde locale utilisée.');
-    return newVisitor.id;
+    return { id: newVisitor.id, isDuplicate: false };
   }
 
   if (isPostgres()) {
@@ -83,7 +87,7 @@ async function createVisitor(data) {
         [email, phone, ip_address]
       );
       if (dupCheck.rows && dupCheck.rows.length) {
-        return dupCheck.rows[0].id;
+        return { id: dupCheck.rows[0].id, isDuplicate: true };
       }
     } catch (err) {
       // ignore dedupe errors and continue to insert
@@ -93,7 +97,7 @@ async function createVisitor(data) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
       [full_name, email, phone, country, visited_at, ip_address, browser, os]
     );
-    return result.rows[0].id;
+    return { id: result.rows[0].id, isDuplicate: false };
   }
   try {
     // MySQL dedupe fallback
@@ -102,7 +106,7 @@ async function createVisitor(data) {
       [email, phone, ip_address]
     );
     if (Array.isArray(existing) && existing.length) {
-      return existing[0].id;
+      return { id: existing[0].id, isDuplicate: true };
     }
   } catch (err) {
     // ignore and continue
@@ -112,7 +116,7 @@ async function createVisitor(data) {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     [full_name, email, phone, country, visited_at, ip_address, browser, os]
   );
-  return result.insertId;
+  return { id: result.insertId, isDuplicate: false };
 }
 
 async function findVisitors(params = {}) {

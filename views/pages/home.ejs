@@ -34,7 +34,7 @@
         <div class="hero-left">
           <div class="hero-badge">🌍 Digital Africa · Innovation · Excellence</div>
           <div class="hero-logo-big">
-            <img class="logo-img" src="" alt="MULTIFORMCOM" />
+            <img class="logo-img" src="<%= settings?.logoUrl || '/images/logo.svg' %>" alt="<%= settings?.siteName || 'MULTIFORMCOM' %>" />
             <h1 class="hero-title">
               <span class="gold">MULTI</span><br />
               <span>FORM</span><br />
@@ -73,7 +73,7 @@
             <div class="about-ring">
               <div class="dot-ring"></div><div class="dot-ring"></div><div class="dot-ring"></div>
               <div class="about-center">
-                <img class="logo-img" src="" alt="MULTIFORMCOM" />
+                <img class="logo-img" src="<%= settings?.logoUrl || '/images/logo.svg' %>" alt="<%= settings?.siteName || 'MULTIFORMCOM' %>" />
               </div>
             </div>
           </div>
@@ -201,10 +201,10 @@
             <div class="section-badge">Contact Direct</div>
             <h2 class="section-title">Prêt à<span class="gold"> faire décoller</span> votre projet ?</h2>
             <div class="section-divider"></div>
-            <div class="contact-item"><div class="contact-icon">📍</div><div><h5>Adresse</h5><p>Afrique de l'Ouest · Mali · Sénégal · Côte d’Ivoire</p></div></div>
-            <div class="contact-item"><div class="contact-icon">📞</div><div><h5>Téléphone</h5><a href="tel:+22363738158">+223 63 73 81 58</a></div></div>
-            <div class="contact-item"><div class="contact-icon">✉️</div><div><h5>Email</h5><a href="mailto:contact@multiformcom.com">contact@multiformcom.com</a></div></div>
-            <a href="https://wa.me/22363738158" target="_blank" class="wa-direct-btn">💬 Ouvrir WhatsApp</a>
+            <div class="contact-item"><div class="contact-icon">📍</div><div><h5>Adresse</h5><p><%= settings?.businessAddress || 'Afrique de l\'Ouest · Mali · Sénégal · Côte d’Ivoire' %></p></div></div>
+            <div class="contact-item"><div class="contact-icon">📞</div><div><h5>Téléphone</h5><a href="tel:<%= (settings?.contactPhone || '+223 63 73 81 58').replace(/[^\d+]/g, '') %>"><%= settings?.contactPhone || '+223 63 73 81 58' %></a></div></div>
+            <div class="contact-item"><div class="contact-icon">✉️</div><div><h5>Email</h5><a href="mailto:<%= settings?.contactEmail || 'contact@multiformcom.com' %>"><%= settings?.contactEmail || 'contact@multiformcom.com' %></a></div></div>
+            <a href="https://wa.me/<%= (settings?.contactPhone || '+223 63 73 81 58').replace(/[^0-9]/g, '') %>" target="_blank" class="wa-direct-btn">💬 Ouvrir WhatsApp</a>
           </div>
           <div class="wa-form-box reveal">
             <div class="wa-form-title">Écrivez-nous <span>directement</span></div>
@@ -237,8 +237,8 @@
           <a href="#contact" class="btn-outline">📧 Nous contacter</a>
         </div>
         <div class="cta-logo-wrap">
-          <img class="cta-logo-img logo-img" src="" alt="logo" />
-          <div class="cta-logo-big">MULTIFORMCOM</div>
+          <img class="cta-logo-img logo-img" src="<%= settings?.logoUrl || '/images/logo.svg' %>" alt="<%= settings?.siteName || 'MULTIFORMCOM' %>" />
+          <div class="cta-logo-big"><%= settings?.siteName || 'MULTIFORMCOM' %></div>
         </div>
         <div class="cta-tagline">“Innovation · Créativité · Impact”</div>
       </div>
@@ -246,8 +246,8 @@
 
     <footer>
       <div class="footer-logo">
-        <img class="logo-img" src="" alt="logo" />
-        <span>MULTIFORMCOM</span>
+        <img class="logo-img" src="<%= settings?.logoUrl || '/images/logo.svg' %>" alt="<%= settings?.siteName || 'MULTIFORMCOM' %>" />
+        <span><%= settings?.siteName || 'MULTIFORMCOM' %></span>
       </div>
       <div class="footer-copy">© 2025 MULTIFORMCOM. Tous droits réservés.</div>
       <div class="footer-links">

@@ -19,11 +19,8 @@ const routes = require('./routes');
 const apiRoutes = require('./routes/api');
 
 const app = express();
+app.set('trust proxy', 1);
 const port = Number(process.env.PORT || 3000);
-
-if (process.env.TRUST_PROXY === 'true' || process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -39,8 +36,8 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://cdn.jsdelivr.net"],
-      styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+      styleSrc: ["'self'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'https:'],
       connectSrc: ["'self'"],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'https://fonts.googleapis.com']
@@ -98,7 +95,7 @@ async function startServer() {
     await loadSiteSettings();
     logEvent('Démarrage du serveur Express');
     app.listen(port, '0.0.0.0', () => {
-      console.log(`Serveur démarré sur http://localhost:${port}`);
+      console.log(`Serveur démarré sur le port ${port}`);
     });
   } catch (error) {
     logError(`Impossible de démarrer le serveur: ${error?.message || error}`);
@@ -110,7 +107,7 @@ async function startServer() {
       logError(`Impossible de charger les paramètres en mode dégradé: ${settingsError?.message || settingsError}`);
     }
     app.listen(port, '0.0.0.0', () => {
-      console.log(`Serveur démarré sur http://localhost:${port} avec mode dégradé.`);
+      console.log(`Serveur démarré sur le port ${port} avec mode dégradé.`);
     });
   }
 }

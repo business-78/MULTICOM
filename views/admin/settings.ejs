@@ -55,6 +55,21 @@
         </div>
 
         <div class="col-12 col-md-6">
+          <label class="form-label">Identifiant administrateur</label>
+          <input class="form-control" name="adminUsername" value="<%= settings.adminUsername || 'admin' %>" required />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Nouveau mot de passe administrateur</label>
+          <input class="form-control" type="password" name="adminPassword" autocomplete="new-password" placeholder="Laisser vide pour conserver le mot de passe actuel" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Confirmer le mot de passe</label>
+          <input class="form-control" type="password" name="adminPasswordConfirm" autocomplete="new-password" placeholder="Confirmez le nouveau mot de passe" />
+        </div>
+
+        <div class="col-12">
           <label class="form-label">Adresse e-mail de contact</label>
           <input class="form-control" type="email" name="contactEmail" value="<%= settings.contactEmail %>" />
         </div>

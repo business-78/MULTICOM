@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const util = require('util');
 const rateLimit = require('express-rate-limit');
 const { findVisitors, getVisitorStats, deleteVisitor, updateVisitor } = require('../models/visitorModel');
+const { loadSiteSettings } = require('../models/settingsModel');
 const { logEvent, logError } = require('../config/logger');
 
 const loginLimiter = rateLimit({
@@ -14,18 +15,18 @@ const loginLimiter = rateLimit({
   message: 'Trop de tentatives de connexion. Veuillez patienter.'
 });
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME?.trim() || 'admin';
 const DEFAULT_ADMIN_PASSWORD = 'Admin@12345';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD?.trim() || DEFAULT_ADMIN_PASSWORD;
 
-async function isValidAdminPassword(password) {
+async function isValidAdminPassword(password, storedHash) {
   if (!password || typeof password !== 'string') {
     return false;
   }
 
-  if (process.env.ADMIN_HASH) {
+  const hash = storedHash || process.env.ADMIN_HASH?.trim();
+  if (hash) {
     try {
-      return await bcrypt.compare(password, process.env.ADMIN_HASH);
+      return await bcrypt.compare(password, hash);
     } catch (error) {
       logError(`Admin hash comparison error: ${error.message}`);
       return false;
@@ -58,7 +59,10 @@ async function loginAdmin(req, res) {
   }
 
   try {
-    const isMatch = username === ADMIN_USERNAME && await isValidAdminPassword(password);
+    const settings = await loadSiteSettings();
+    const adminUsername = settings.adminUsername || process.env.ADMIN_USERNAME?.trim() || 'admin';
+    const adminHash = settings.adminPasswordHash || process.env.ADMIN_HASH?.trim();
+    const isMatch = username === adminUsername && await isValidAdminPassword(password, adminHash);
     if (isMatch) {
       return req.session.regenerate((regenerateErr) => {
         if (regenerateErr) {
