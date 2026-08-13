@@ -1,6 +1,8 @@
 node_modules/
 .env
 logs/*.log
+original/*.bak
+database/*_fallback.json
 *.log
 npm-debug.log*
 .DS_Store

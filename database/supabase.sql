@@ -4,6 +4,8 @@ CREATE TABLE IF NOT EXISTS visitors (
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
   country TEXT NOT NULL,
+  message TEXT,
+  service TEXT,
   visited_at TIMESTAMP NOT NULL,
   ip_address TEXT NOT NULL,
   browser TEXT NOT NULL,

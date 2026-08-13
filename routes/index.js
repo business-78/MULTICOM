@@ -1,14 +1,15 @@
 // /routes/index.js
 // Point d'entrée des routes de l'application.
 const express = require('express');
+const path = require('path');
 const router = express.Router();
-const homeController = require('../controllers/homeController');
 const adminController = require('../controllers/adminController');
 const settingsController = require('../controllers/settingsController');
 const { validateBody } = require('../middleware/security');
 
-router.get('/', homeController.renderHome);
-router.post('/visitor', validateBody, homeController.submitVisitor);
+router.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'original', 'index.html'));
+});
 
 router.get('/admin/login', adminController.renderLogin);
 router.post('/admin/login', adminController.loginLimiter, adminController.loginAdmin);

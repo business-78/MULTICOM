@@ -68,6 +68,8 @@ async function initializeDatabase() {
           email TEXT NOT NULL,
           phone TEXT NOT NULL,
           country TEXT NOT NULL,
+          message TEXT,
+          service TEXT,
           visited_at TIMESTAMP NOT NULL,
           ip_address TEXT NOT NULL,
           browser TEXT NOT NULL,
@@ -99,6 +101,8 @@ async function initializeDatabase() {
           email VARCHAR(255) NOT NULL,
           phone VARCHAR(50) NOT NULL,
           country VARCHAR(100) NOT NULL,
+          message TEXT,
+          service TEXT,
           visited_at DATETIME NOT NULL,
           ip_address VARCHAR(45) NOT NULL,
           browser VARCHAR(255) NOT NULL,
@@ -122,6 +126,18 @@ async function initializeDatabase() {
           config_value TEXT
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
       `);
+    }
+
+    if (databaseUrl) {
+      await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS message TEXT`);
+      await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS service TEXT`);
+    } else {
+      try {
+        await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS message TEXT`);
+        await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS service TEXT`);
+      } catch (alterError) {
+        // Some MySQL versions may not support IF NOT EXISTS on ALTER TABLE; ignore if already exists.
+      }
     }
 
     const logsDir = path.join(__dirname, '..', 'logs');

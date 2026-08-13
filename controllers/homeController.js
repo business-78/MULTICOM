@@ -17,13 +17,14 @@ async function renderHome(req, res) {
 
 async function submitVisitor(req, res) {
   try {
-    const { fullName, email, phone, country, message } = req.body;
-    const requestText = String(country || message || '').trim();
+    const { fullName, email, phone, country, message, service } = req.body;
     const normalized = {
       fullName: String(fullName || '').trim(),
       email: String(email || '').trim().toLowerCase(),
       phone: String(phone || '').trim(),
-      country: requestText
+      country: String(country || '').trim(),
+      message: String(message || '').trim(),
+      service: String(service || '').trim()
     };
 
     const errors = validateVisitorInput(normalized);
@@ -38,6 +39,8 @@ async function submitVisitor(req, res) {
       email: normalized.email,
       phone: normalized.phone,
       country: normalized.country,
+      message: normalized.message,
+      service: normalized.service,
       visited_at: visitedAt,
       ip_address: clientInfo.ip,
       browser: clientInfo.browser,
@@ -54,7 +57,10 @@ async function submitVisitor(req, res) {
       await sendTelegramMessage({
         fullName: normalized.fullName,
         phone: normalized.phone,
-        message: normalized.country,
+        email: normalized.email,
+        country: normalized.country,
+        message: normalized.message,
+        service: normalized.service,
         visitedAt,
         ip: clientInfo.ip
       });

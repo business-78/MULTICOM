@@ -5,14 +5,15 @@ const { getClientInfo, validateVisitorInput } = require('../middleware/security'
 const { sendTelegramMessage } = require('../middleware/telegram');
 const { logEvent, logError } = require('../config/logger');
 
-router.post('/visitors', async (req, res) => {
+router.post('/visitors', validateBody, async (req, res) => {
   try {
-    const requestText = String(req.body.country || req.body.message || '').trim();
     const normalized = {
       fullName: String(req.body.fullName || '').trim(),
       email: String(req.body.email || '').trim().toLowerCase(),
       phone: String(req.body.phone || '').trim(),
-      country: requestText
+      country: String(req.body.country || '').trim(),
+      message: String(req.body.message || '').trim(),
+      service: String(req.body.service || '').trim()
     };
 
     const errors = validateVisitorInput(normalized);
@@ -27,6 +28,8 @@ router.post('/visitors', async (req, res) => {
       email: normalized.email,
       phone: normalized.phone,
       country: normalized.country,
+      message: normalized.message,
+      service: normalized.service,
       visited_at: visitedAt,
       ip_address: clientInfo.ip,
       browser: clientInfo.browser,
@@ -42,7 +45,10 @@ router.post('/visitors', async (req, res) => {
     await sendTelegramMessage({
       fullName: normalized.fullName,
       phone: normalized.phone,
-      message: normalized.country,
+      email: normalized.email,
+      country: normalized.country,
+      message: normalized.message,
+      service: normalized.service,
       visitedAt,
       ip: clientInfo.ip
     }).catch((error) => logError(`Telegram error: ${error.message}`));

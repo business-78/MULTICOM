@@ -5,12 +5,12 @@ const useragent = require('useragent');
 function validateVisitorInput(data) {
   const errors = [];
   const { fullName, email, phone, country, message } = data;
-  const requestText = String(country || message || '').trim();
 
   if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 3) errors.push('Le nom est requis.');
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Email invalide.');
   if (!phone || !/^\+?[0-9\s-]{6,15}$/.test(phone)) errors.push('Téléphone invalide.');
-  if (!requestText || requestText.length < 5) errors.push('Le message est requis.');
+  if (!country || typeof country !== 'string' || country.trim().length < 2) errors.push('Le pays est requis.');
+  if (!message || typeof message !== 'string' || message.trim().length < 5) errors.push('Le message est requis.');
 
   return errors;
 }
@@ -29,7 +29,7 @@ function sanitizeInput(value) {
 }
 
 function validateBody(req, res, next) {
-  const fields = ['fullName', 'email', 'phone', 'country', 'message'];
+  const fields = ['fullName', 'email', 'phone', 'country', 'message', 'service'];
   for (const field of fields) {
     if (req.body[field]) {
       req.body[field] = sanitizeInput(req.body[field]);

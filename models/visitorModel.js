@@ -45,7 +45,7 @@ function getDbErrorMessage(error) {
 
 async function createVisitor(data) {
   const pool = getPool();
-  const { full_name, email, phone, country, visited_at, ip_address, browser, os } = data;
+  const { full_name, email, phone, country, message, service, visited_at, ip_address, browser, os } = data;
 
   if (!pool || !isDbAvailable()) {
     const fallback = readFallbackVisitors();
@@ -67,6 +67,8 @@ async function createVisitor(data) {
       email,
       phone,
       country,
+      message,
+      service,
       visited_at,
       ip_address,
       browser,
@@ -93,9 +95,9 @@ async function createVisitor(data) {
       // ignore dedupe errors and continue to insert
     }
     const result = await pool.query(
-      `INSERT INTO visitors (full_name, email, phone, country, visited_at, ip_address, browser, os)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
-      [full_name, email, phone, country, visited_at, ip_address, browser, os]
+      `INSERT INTO visitors (full_name, email, phone, country, message, service, visited_at, ip_address, browser, os)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
+      [full_name, email, phone, country, message, service, visited_at, ip_address, browser, os]
     );
     return { id: result.rows[0].id, isDuplicate: false };
   }
@@ -112,9 +114,9 @@ async function createVisitor(data) {
     // ignore and continue
   }
   const [result] = await pool.execute(
-    `INSERT INTO visitors (full_name, email, phone, country, visited_at, ip_address, browser, os)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [full_name, email, phone, country, visited_at, ip_address, browser, os]
+    `INSERT INTO visitors (full_name, email, phone, country, message, service, visited_at, ip_address, browser, os)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [full_name, email, phone, country, message, service, visited_at, ip_address, browser, os]
   );
   return { id: result.insertId, isDuplicate: false };
 }
