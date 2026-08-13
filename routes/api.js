@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createVisitor, findVisitors, getVisitorStats } = require('../models/visitorModel');
-const { getClientInfo, validateVisitorInput } = require('../middleware/security');
+const { getClientInfo, validateBody, validateVisitorInput } = require('../middleware/security');
 const { sendTelegramMessage } = require('../middleware/telegram');
 const { logEvent, logError } = require('../config/logger');
 
