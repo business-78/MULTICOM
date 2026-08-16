@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { loadSiteSettings, getSiteSettings, saveSiteSettings } = require('../models/settingsModel');
+const { DatabaseUnavailableError } = require('../config/errors');
 const { logEvent, logError } = require('../config/logger');
 
 async function renderSettings(req, res) {
@@ -88,10 +89,13 @@ async function updateSettings(req, res) {
     });
   } catch (error) {
     logError(`Update settings error: ${error.message}`);
+    const message = error instanceof DatabaseUnavailableError
+      ? 'Base de données indisponible. Impossible d’enregistrer les paramètres.'
+      : 'Impossible d’enregistrer les paramètres.';
     return res.render('admin/settings', {
       title: 'Paramètres du site',
       settings: getSiteSettings(),
-      error: 'Impossible d’enregistrer les paramètres.',
+      error: message,
       csrfToken: req.csrfToken ? req.csrfToken() : ''
     });
   }

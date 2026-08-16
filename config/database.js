@@ -1,11 +1,9 @@
-// /config/database.js
-// Configuration et initialisation de la base de données avec support MySQL ou PostgreSQL.
-const mysql = require('mysql2/promise');
+// Configuration PostgreSQL (Neon) via DATABASE_URL uniquement.
 const { Pool } = require('pg');
 const dns = require('dns');
 const dotenv = require('dotenv');
-const fs = require('fs');
 const path = require('path');
+const { DatabaseUnavailableError } = require('./errors');
 
 try {
   if (typeof dns.setDefaultResultOrder === 'function') {
@@ -18,138 +16,104 @@ try {
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 const databaseUrl = process.env.DATABASE_URL?.trim() || null;
-let pool;
+let pool = null;
 let dbAvailable = false;
 
-if (databaseUrl) {
-  pool = new Pool({
+function createPool() {
+  if (!databaseUrl) {
+    return null;
+  }
+
+  const useSsl = databaseUrl.includes('sslmode=require') || process.env.NODE_ENV === 'production';
+  return new Pool({
     connectionString: databaseUrl,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-    family: 4
-  });
-} else {
-  const mysqlHost = (process.env.DB_HOST || '127.0.0.1').trim();
-  pool = mysql.createPool({
-    host: mysqlHost === 'localhost' ? '127.0.0.1' : mysqlHost,
-    port: Number(process.env.DB_PORT || 3306),
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
-    database: process.env.DB_NAME || 'multicom_db',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-    charset: 'utf8mb4'
+    ssl: useSsl ? { rejectUnauthorized: false } : false,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
   });
 }
 
 async function initializeDatabase() {
-  if (!pool) {
-    console.warn('initializeDatabase: database pool non disponible.');
+  if (!databaseUrl) {
+    console.warn('initializeDatabase: DATABASE_URL non configurée.');
+    pool = null;
     dbAvailable = false;
     return;
   }
+
+  pool = createPool();
 
   try {
     await pool.query('SELECT 1');
     dbAvailable = true;
   } catch (error) {
-    console.warn('Database initial connection failed:', error?.message || error);
+    console.warn('Database initial connection failed.');
+    try {
+      await pool.end();
+    } catch (endError) {
+      // ignore pool shutdown errors
+    }
     pool = null;
     dbAvailable = false;
     return;
   }
 
   try {
-    if (databaseUrl) {
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS visitors (
-          id SERIAL PRIMARY KEY,
-          full_name TEXT NOT NULL,
-          email TEXT NOT NULL,
-          phone TEXT NOT NULL,
-          country TEXT NOT NULL,
-          message TEXT,
-          service TEXT,
-          visited_at TIMESTAMP NOT NULL,
-          ip_address TEXT NOT NULL,
-          browser TEXT NOT NULL,
-          os TEXT NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS visitors (
+        id SERIAL PRIMARY KEY,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        country TEXT NOT NULL,
+        message TEXT,
+        service TEXT,
+        visited_at TIMESTAMP NOT NULL,
+        ip_address TEXT NOT NULL,
+        browser TEXT NOT NULL,
+        os TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
 
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS admin_logs (
-          id SERIAL PRIMARY KEY,
-          action TEXT NOT NULL,
-          details TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-      `);
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        config_key TEXT PRIMARY KEY,
+        config_value TEXT
+      )
+    `);
 
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS settings (
-          config_key TEXT PRIMARY KEY,
-          config_value TEXT
-        )
-      `);
-    } else {
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS visitors (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          full_name VARCHAR(255) NOT NULL,
-          email VARCHAR(255) NOT NULL,
-          phone VARCHAR(50) NOT NULL,
-          country VARCHAR(100) NOT NULL,
-          message TEXT,
-          service TEXT,
-          visited_at DATETIME NOT NULL,
-          ip_address VARCHAR(45) NOT NULL,
-          browser VARCHAR(255) NOT NULL,
-          os VARCHAR(255) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_visitors_visited_at ON visitors (visited_at DESC)
+    `);
 
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS admin_logs (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          action VARCHAR(255) NOT NULL,
-          details TEXT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-
-      await pool.query(`
-        CREATE TABLE IF NOT EXISTS settings (
-          config_key VARCHAR(255) PRIMARY KEY,
-          config_value TEXT
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-      `);
-    }
-
-    if (databaseUrl) {
-      await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS message TEXT`);
-      await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS service TEXT`);
-    } else {
-      try {
-        await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS message TEXT`);
-        await pool.query(`ALTER TABLE visitors ADD COLUMN IF NOT EXISTS service TEXT`);
-      } catch (alterError) {
-        // Some MySQL versions may not support IF NOT EXISTS on ALTER TABLE; ignore if already exists.
-      }
-    }
-
-    const logsDir = path.join(__dirname, '..', 'logs');
-    if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir, { recursive: true });
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_visitors_dedupe ON visitors (email, phone, ip_address, visited_at DESC)
+    `);
   } catch (error) {
-    console.warn('Database init warning:', error?.message || error);
-    console.warn('Database init details:', error?.stack || error);
+    console.warn('Database schema initialization warning.');
   }
 }
 
+function getPool() {
+  return pool;
+}
+
+function isDbAvailable() {
+  return dbAvailable && Boolean(pool);
+}
+
+function assertDbAvailable() {
+  if (!isDbAvailable()) {
+    throw new DatabaseUnavailableError();
+  }
+  return pool;
+}
+
 module.exports = {
-  getPool: () => pool,
+  getPool,
   initializeDatabase,
-  isDbAvailable: () => dbAvailable
+  isDbAvailable,
+  assertDbAvailable
 };

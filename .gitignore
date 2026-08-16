@@ -7,3 +7,11 @@ database/*_fallback.json
 npm-debug.log*
 .DS_Store
 .vscode/
+temp_*
+tmp_*
+*_check.txt
+*_result.txt
+*_output.txt
+server_test_*.txt
+server_run_out.txt
+push_output.txt

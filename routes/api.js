@@ -3,7 +3,22 @@ const router = express.Router();
 const { createVisitor, findVisitors, getVisitorStats } = require('../models/visitorModel');
 const { getClientInfo, validateBody, validateVisitorInput } = require('../middleware/security');
 const { sendTelegramMessage } = require('../middleware/telegram');
+const { ensureAdminApi } = require('../controllers/adminController');
+const { DatabaseUnavailableError } = require('../config/errors');
 const { logEvent, logError } = require('../config/logger');
+
+function handleDatabaseError(res, error, context) {
+  if (error instanceof DatabaseUnavailableError || error.statusCode === 503) {
+    logError(`${context}: base de données indisponible.`);
+    return res.status(503).json({
+      success: false,
+      errors: ['Service temporairement indisponible. Veuillez réessayer.']
+    });
+  }
+
+  logError(`${context}: ${error.message}`);
+  return res.status(500).json({ success: false, errors: ['Erreur serveur.'] });
+}
 
 router.post('/visitors', validateBody, async (req, res) => {
   try {
@@ -41,7 +56,8 @@ router.post('/visitors', validateBody, async (req, res) => {
       return res.status(200).json({ success: true, message: 'Visiteur déjà enregistré récemment.' });
     }
 
-    logEvent(`API visitor created: ${normalized.fullName}`);
+    logEvent(`API visitor created in Neon: ${normalized.fullName} (id=${visitorResult.id})`);
+
     await sendTelegramMessage({
       fullName: normalized.fullName,
       phone: normalized.phone,
@@ -55,40 +71,25 @@ router.post('/visitors', validateBody, async (req, res) => {
 
     return res.status(201).json({ success: true, message: 'Visiteur enregistré.' });
   } catch (error) {
-    logError(`API visitor error: ${error.message}`);
-    return res.status(500).json({ success: false, errors: ['Erreur serveur.'] });
+    return handleDatabaseError(res, error, 'API visitor POST');
   }
 });
 
-router.get('/visitors', async (req, res) => {
+router.get('/visitors', ensureAdminApi, async (req, res) => {
   try {
     const visitors = await findVisitors({ search: req.query.q, sort: 'DESC' });
     return res.json({ success: true, visitors });
   } catch (error) {
-    logError(`API visitors list error: ${error.message}`);
-    return res.status(500).json({ success: false, errors: ['Erreur serveur.'] });
+    return handleDatabaseError(res, error, 'API visitors GET');
   }
 });
 
-router.get('/stats', async (req, res) => {
+router.get('/stats', ensureAdminApi, async (req, res) => {
   try {
     const stats = await getVisitorStats();
     return res.json({ success: true, stats });
   } catch (error) {
-    logError(`API stats error: ${error.message}`);
-    return res.status(500).json({ success: false, errors: ['Erreur serveur.'] });
-  }
-});
-
-// Temporary debug route to write site settings (no CSRF, under /api)
-router.post('/debug/settings', async (req, res) => {
-  try {
-    const { saveSiteSettings } = require('../models/settingsModel');
-    const settings = await saveSiteSettings(req.body || {});
-    return res.json({ success: true, settings });
-  } catch (error) {
-    logError(`API debug settings error: ${error.message}`);
-    return res.status(500).json({ success: false, errors: ['Impossible d’enregistrer les paramètres.'] });
+    return handleDatabaseError(res, error, 'API stats GET');
   }
 });
 

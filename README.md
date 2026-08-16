@@ -1,76 +1,91 @@
 # MULTICOM - Plateforme de visiteurs
 
 ## Vue d’ensemble
-Ce projet fournit un site public moderne, un formulaire de visiteurs, une intégration Telegram, un tableau de bord administrateur sécurisé et une base de données prête pour un déploiement en production.
+
+Site public (`original/index.html`), formulaire visiteurs, administration EJS sécurisée, intégration Telegram optionnelle, base PostgreSQL Neon.
+
+## Architecture
+
+```
+GitHub → Vercel → Express (serverless) → Neon PostgreSQL
+```
 
 ## Prérequis
+
 - Node.js 20 LTS ou plus
 - npm
-- Une base de données MySQL ou PostgreSQL
-- Un bot Telegram (optionnel)
+- Projet Neon PostgreSQL
+- Projet Vercel connecté au dépôt GitHub
 
 ## Installation locale
-1. Cloner ou copier ce dossier.
-2. Installer les dépendances :
-   `npm install`
-3. Copier le fichier `.env.example` vers `.env` puis renseigner les variables.
-4. Démarrer le serveur :
-   `npm start`
+
+1. Cloner le dépôt.
+2. `npm install`
+3. Copier `.env.example` vers `.env` et renseigner les variables.
+4. Exécuter le schéma SQL : `database/schema.sql` (Neon SQL Editor ou `psql`).
+5. `npm start` — serveur local sur le port 3000.
 
 ## Variables d’environnement
-Les variables suivantes doivent être présentes dans `.env` :
-- `PORT`
-- `NODE_ENV`
-- `DATABASE_URL` (pour Supabase/PostgreSQL)
-- `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (pour MySQL)
-- `TELEGRAM_BOT_TOKEN`
-- `TELEGRAM_CHAT_ID`
-- `SESSION_SECRET`
-- `JWT_SECRET`
-- `ADMIN_EMAIL`
-- `ADMIN_PASSWORD`
-- `ADMIN_USERNAME`
+
+| Variable | Obligatoire | Description |
+|----------|-------------|-------------|
+| `DATABASE_URL` | Oui | Chaîne PostgreSQL Neon (`sslmode=require`) |
+| `SESSION_SECRET` | Oui (prod) | Secret pour cookies de session admin |
+| `ADMIN_USERNAME` | Oui | Identifiant administrateur |
+| `ADMIN_HASH` | Oui (prod) | Hash bcrypt du mot de passe admin |
+| `NODE_ENV` | Recommandé | `production` sur Vercel |
+| `TELEGRAM_BOT_TOKEN` | Optionnel | Token bot Telegram |
+| `TELEGRAM_CHAT_ID` | Optionnel | Chat ID Telegram |
+| `NOTIFICATIONS_ENABLED` | Optionnel | `true` / `false` |
+
+Générer un hash admin :
+
+```bash
+node -e "require('bcryptjs').hash('VotreMotDePasse', 10).then(console.log)"
+```
 
 ## Base de données
-- Le projet crée automatiquement les tables nécessaires au démarrage.
-- Pour Supabase PostgreSQL, utilisez `DATABASE_URL`.
-- Le script SQL de référence est disponible dans `database/supabase.sql`.
 
-## Configuration Telegram
-1. Créer un bot avec BotFather.
-2. Récupérer le token et le chat ID.
-3. Les renseigner dans `.env`.
+- PostgreSQL Neon uniquement via `DATABASE_URL`.
+- Schéma de référence : `database/schema.sql`.
+- Les tables sont aussi créées automatiquement au démarrage si absentes.
 
-## Déploiement sur Render
-1. Créer un nouveau service Web sur Render.
-2. Connecter le dépôt GitHub.
-3. Sélectionner `Node`.
-4. Définir le build command : `npm install`
-5. Définir le start command : `npm start`
-6. Ajouter les variables d’environnement depuis `.env`.
+## Déploiement Vercel
 
-## Déploiement avec Supabase
-1. Créer une base PostgreSQL sur Supabase.
-2. Ouvrir l’éditeur SQL.
-3. Exécuter le contenu de `database/supabase.sql`.
-4. Copier la chaîne de connexion dans `DATABASE_URL`.
+1. Connecter le dépôt `business-78/MULTICOM` au projet Vercel `multicom`.
+2. Ajouter les variables d’environnement dans Vercel (Settings → Environment Variables).
+3. Pousser sur `main` — Vercel déploie automatiquement.
+4. Vérifier :
+   - `GET /` → site public
+   - `POST /api/visitors` → insertion Neon
+   - `/admin/login` → administration
 
 ## Sécurité
-Le projet intègre :
-- validation serveur des données
-- protection CSRF
-- protection XSS via échappement et en-têtes Helmet
-- limitation des tentatives de connexion
-- sessions sécurisées
-- mot de passe administrateur à configurer dans `.env`
 
-## Structure du projet
-- `controllers/`
-- `routes/`
-- `models/`
-- `middleware/`
-- `config/`
-- `public/`
-- `views/`
-- `database/`
-- `logs/`
+- Validation serveur des données visiteurs
+- CSRF sur routes admin
+- Helmet (headers + CSP)
+- Rate limiting
+- Cookies signés (`cookie-session`) compatibles serverless
+- Aucun mot de passe par défaut — `ADMIN_HASH` requis
+- Routes API sensibles protégées par authentification admin
+
+## Structure
+
+- `original/` — frontend public
+- `app.js` — application Express (Vercel + local)
+- `api/index.js` — point d’entrée Vercel serverless
+- `controllers/` — logique admin/settings
+- `models/` — accès Neon
+- `routes/` — routes web et API
+- `views/` — templates EJS admin
+- `public/` — assets admin
+- `database/schema.sql` — schéma PostgreSQL
+
+## Sauvegarde (recommandation 3-2-1)
+
+1. **Neon** — base de production (activer les backups Neon si plan payant).
+2. **Export automatisé** — GitHub Action `pg_dump` vers stockage privé (non inclus, à configurer manuellement).
+3. **Copie hors ligne** — export CSV périodique via `/admin/export/excel`.
+
+Ne jamais committer de données visiteurs ou secrets dans Git.

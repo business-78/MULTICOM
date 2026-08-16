@@ -1,12 +1,11 @@
-const fs = require('fs');
-const path = require('path');
 const dotenv = require('dotenv');
-const { getPool, isDbAvailable } = require('../config/database');
-const { logError, logEvent } = require('../config/logger');
+const path = require('path');
+const { assertDbAvailable, isDbAvailable, getPool } = require('../config/database');
+const { DatabaseUnavailableError } = require('../config/errors');
+const { logError, logEvent, logWarn } = require('../config/logger');
 
 dotenv.config({ path: path.resolve(__dirname, '..', '.env'), override: true });
 
-const fallbackFile = path.join(__dirname, '..', 'database', 'settings_fallback.json');
 const allowedKeys = [
   'siteName',
   'logoUrl',
@@ -22,43 +21,23 @@ const allowedKeys = [
   'adminPasswordHash'
 ];
 
-let settingsCache = {
-  siteName: process.env.SITE_NAME || 'MULTIFORMCOM',
-  logoUrl: process.env.LOGO_URL || '',
-  primaryColor: process.env.SITE_PRIMARY_COLOR || '#b38d42',
-  secondaryColor: process.env.SITE_SECONDARY_COLOR || '#ffffff',
-  contactEmail: process.env.CONTACT_EMAIL || 'contact@multiformcom.com',
-  contactPhone: process.env.CONTACT_PHONE || '+223 63 73 81 58',
-  businessAddress: process.env.BUSINESS_ADDRESS || 'Afrique de l\'Ouest · Mali · Sénégal · Côte d’Ivoire',
-  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
-  telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
-  notificationsEnabled: process.env.NOTIFICATIONS_ENABLED || 'true',
-  adminUsername: process.env.ADMIN_USERNAME?.trim() || 'admin',
-  adminPasswordHash: process.env.ADMIN_HASH?.trim() || ''
-};
+let settingsCache = buildEnvDefaults();
 
-function isPostgres() {
-  return Boolean(process.env.DATABASE_URL && process.env.DATABASE_URL.includes('postgres'));
-}
-
-function readFallbackSettings() {
-  try {
-    if (!fs.existsSync(fallbackFile)) return {};
-    const raw = fs.readFileSync(fallbackFile, 'utf8');
-    return JSON.parse(raw || '{}');
-  } catch (error) {
-    logError(`Lecture fallback settings impossible: ${error.message}`);
-    return {};
-  }
-}
-
-function writeFallbackSettings(settings) {
-  try {
-    fs.mkdirSync(path.dirname(fallbackFile), { recursive: true });
-    fs.writeFileSync(fallbackFile, JSON.stringify(settings, null, 2), 'utf8');
-  } catch (error) {
-    logError(`Écriture fallback settings impossible: ${error.message}`);
-  }
+function buildEnvDefaults() {
+  return {
+    siteName: process.env.SITE_NAME || 'MULTIFORMCOM',
+    logoUrl: process.env.LOGO_URL || '',
+    primaryColor: process.env.SITE_PRIMARY_COLOR || '#b38d42',
+    secondaryColor: process.env.SITE_SECONDARY_COLOR || '#ffffff',
+    contactEmail: process.env.CONTACT_EMAIL || 'contact@multiformcom.com',
+    contactPhone: process.env.CONTACT_PHONE || '+223 63 73 81 58',
+    businessAddress: process.env.BUSINESS_ADDRESS || 'Afrique de l\'Ouest · Mali · Sénégal · Côte d’Ivoire',
+    telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
+    notificationsEnabled: process.env.NOTIFICATIONS_ENABLED || 'true',
+    adminUsername: process.env.ADMIN_USERNAME?.trim() || 'admin',
+    adminPasswordHash: process.env.ADMIN_HASH?.trim() || ''
+  };
 }
 
 function getEnvValue(key) {
@@ -82,17 +61,24 @@ function normalizeSettings(rawSettings = {}) {
   return normalized;
 }
 
-async function loadSiteSettings() {
-  const pool = getPool();
-  let settings = normalizeSettings();
+function applyEnvOverrides(settings) {
+  settings.telegramBotToken = getEnvValue('TELEGRAM_BOT_TOKEN') || settings.telegramBotToken || '';
+  settings.telegramChatId = getEnvValue('TELEGRAM_CHAT_ID') || settings.telegramChatId || '';
+  settings.notificationsEnabled = getEnvValue('NOTIFICATIONS_ENABLED') || settings.notificationsEnabled || 'true';
+  settings.adminUsername = getEnvValue('ADMIN_USERNAME') || settings.adminUsername || 'admin';
+  settings.adminPasswordHash = getEnvValue('ADMIN_HASH') || settings.adminPasswordHash || '';
+  return settings;
+}
 
-  if (pool && isDbAvailable()) {
+async function loadSiteSettings() {
+  let settings = normalizeSettings(buildEnvDefaults());
+
+  if (isDbAvailable()) {
     try {
-      const query = 'SELECT config_key, config_value FROM settings';
-      const result = isPostgres() ? await pool.query(query) : await pool.query(query);
-      const rows = isPostgres() ? result.rows : result[0];
-      if (Array.isArray(rows)) {
-        rows.forEach((row) => {
+      const pool = getPool();
+      const result = await pool.query('SELECT config_key, config_value FROM settings');
+      if (Array.isArray(result.rows)) {
+        result.rows.forEach((row) => {
           if (row.config_key && allowedKeys.includes(row.config_key)) {
             settings[row.config_key] = row.config_value || '';
           }
@@ -100,24 +86,17 @@ async function loadSiteSettings() {
       }
     } catch (error) {
       logError(`Chargement des paramètres impossible: ${error.message}`);
-      const fallback = readFallbackSettings();
-      settings = { ...settings, ...fallback };
     }
   } else {
-    const fallback = readFallbackSettings();
-    settings = { ...settings, ...fallback };
+    logWarn('loadSiteSettings: base de données indisponible, utilisation des valeurs env uniquement.');
   }
 
-  settings.telegramBotToken = getEnvValue('TELEGRAM_BOT_TOKEN') || settings.telegramBotToken || '';
-  settings.telegramChatId = getEnvValue('TELEGRAM_CHAT_ID') || settings.telegramChatId || '';
-  settings.notificationsEnabled = getEnvValue('NOTIFICATIONS_ENABLED') || settings.notificationsEnabled || 'true';
-  settings.adminUsername = getEnvValue('ADMIN_USERNAME') || settings.adminUsername || 'admin';
-  settings.adminPasswordHash = getEnvValue('ADMIN_HASH') || settings.adminPasswordHash || '';
+  settings = applyEnvOverrides(settings);
 
   if (!settings.telegramBotToken || !settings.telegramChatId) {
-    logError(`loadSiteSettings warning: telegram config incomplete. tokenSet=${Boolean(settings.telegramBotToken)} chatIdSet=${Boolean(settings.telegramChatId)} notificationsEnabled=${settings.notificationsEnabled}`);
+    logWarn(`loadSiteSettings: configuration Telegram incomplète. notificationsEnabled=${settings.notificationsEnabled}`);
   } else {
-    logEvent(`loadSiteSettings loaded Telegram config. tokenSet=${Boolean(settings.telegramBotToken)} chatIdSet=${Boolean(settings.telegramChatId)} notificationsEnabled=${settings.notificationsEnabled}`);
+    logEvent(`loadSiteSettings: configuration Telegram chargée. notificationsEnabled=${settings.notificationsEnabled}`);
   }
 
   settingsCache = settings;
@@ -125,39 +104,21 @@ async function loadSiteSettings() {
 }
 
 async function saveSiteSettings(updates) {
-  const pool = getPool();
+  const pool = assertDbAvailable();
   const newSettings = normalizeSettings({ ...settingsCache, ...updates });
 
-  if (pool && isDbAvailable()) {
-    try {
-      if (isPostgres()) {
-        const query = `INSERT INTO settings (config_key, config_value) VALUES ($1, $2)
-          ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value`;
-        for (const key of allowedKeys) {
-          await pool.query(query, [key, newSettings[key]]);
-        }
-      } else {
-        const query = `INSERT INTO settings (config_key, config_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE config_value = VALUES(config_value)`;
-        for (const key of allowedKeys) {
-          await pool.query(query, [key, newSettings[key]]);
-        }
-      }
-    } catch (error) {
-      logError(`Enregistrement des paramètres impossible: ${error.message}`);
-      writeFallbackSettings(newSettings);
+  try {
+    const query = `INSERT INTO settings (config_key, config_value) VALUES ($1, $2)
+      ON CONFLICT (config_key) DO UPDATE SET config_value = EXCLUDED.config_value`;
+    for (const key of allowedKeys) {
+      await pool.query(query, [key, newSettings[key]]);
     }
-  } else {
-    writeFallbackSettings(newSettings);
+  } catch (error) {
+    logError(`Enregistrement des paramètres impossible: ${error.message}`);
+    throw new DatabaseUnavailableError();
   }
 
-  settingsCache = newSettings;
-  // Ensure a local fallback is always available so the app can read settings
-  // even if the database becomes unreachable later.
-  try {
-    writeFallbackSettings(newSettings);
-  } catch (err) {
-    // writeFallbackSettings already logs errors; swallow to avoid crashing.
-  }
+  settingsCache = applyEnvOverrides(newSettings);
   return settingsCache;
 }
 
@@ -165,8 +126,14 @@ function getSiteSettings() {
   return settingsCache;
 }
 
+function hasSecureAdminCredentials(settings = getSiteSettings()) {
+  const hash = settings.adminPasswordHash || getEnvValue('ADMIN_HASH');
+  return Boolean(hash && hash.length >= 20);
+}
+
 module.exports = {
   loadSiteSettings,
   getSiteSettings,
-  saveSiteSettings
+  saveSiteSettings,
+  hasSecureAdminCredentials
 };
