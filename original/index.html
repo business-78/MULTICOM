@@ -317,6 +317,10 @@ section{position:relative;overflow:hidden;}
 .ff textarea{resize:vertical;min-height:110px;}
 .wa-btn{width:100%;background:#25D366;color:white;border:none;padding:15px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.93rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .3s;box-shadow:0 4px 18px rgba(37,211,102,0.3);}
 .wa-btn:hover{background:#1DB954;transform:translateY(-2px);}
+.form-submit-btn{width:100%;background:var(--navy);color:white;border:none;padding:15px;border-radius:8px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.93rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .3s;box-shadow:0 4px 18px rgba(27,43,107,0.25);}
+.form-submit-btn:hover:not(:disabled){background:var(--blue);transform:translateY(-2px);}
+.form-submit-btn:disabled{opacity:.75;cursor:not-allowed;transform:none;}
+.form-submit-btn.is-sending{background:#10B981;}
 .form-note{text-align:center;font-size:.7rem;color:var(--grey2);margin-top:12px;}
 .form-note span{color:#25D366;font-weight:600;}
 
@@ -1013,21 +1017,20 @@ footer{background:#0A1236;border-top:1px solid rgba(255,255,255,.05);padding:22p
       <div class="wa-form reveal-right">
         <div class="form-title">Écris-nous <span>ici</span></div>
         <div class="form-sub">Décris ton projet — on te revient personnellement avec une solution adaptée.</div>
+        <form id="contact-form" novalidate>
         <div class="ff" id="f-service-wrap" style="display:none">
-          <label>🎯 Service demandé</label>
+          <label for="f-service">🎯 Service demandé</label>
           <input type="text" id="f-service" readonly style="background:var(--blue-xlight);color:var(--navy);font-weight:600;border-color:var(--navy);">
         </div>
-        <div class="ff"><label>👤 Nom complet <span>*</span></label><input type="text" id="f-nom" placeholder="Ton prénom et nom" autocomplete="name"></div>
-        <div class="ff"><label>📧 Email <span>*</span></label><input type="email" id="f-email" placeholder="Ex : contact@entreprise.com" autocomplete="email"></div>
-        <div class="ff"><label>🌍 Pays <span>*</span></label><input type="text" id="f-country" placeholder="Ex : Mali" autocomplete="country-name"></div>
-        <div class="ff"><label>📱 Ton numéro de contact <span>*</span></label><input type="tel" id="f-phone" placeholder="Ex : +223 70 00 00 00" autocomplete="tel"></div>
-        <div class="ff"><label>✍️ Votre Demande <span>*</span></label><textarea id="f-msg" placeholder="Dis-nous ce que tu veux faire. Par exemple : je veux créer une boutique en ligne pour vendre mes produits..."></textarea></div>
-        <button class="wa-btn" type="button" onclick="envoyerDemande()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-          Envoyer ma demande →
-        </button>
+        <div class="ff"><label for="f-nom">👤 Nom complet <span>*</span></label><input type="text" id="f-nom" placeholder="Ton prénom et nom" autocomplete="name" required></div>
+        <div class="ff"><label for="f-email">📧 Email <span>*</span></label><input type="email" id="f-email" placeholder="Ex : contact@entreprise.com" autocomplete="email" required></div>
+        <div class="ff"><label for="f-country">🌍 Pays <span>*</span></label><input type="text" id="f-country" placeholder="Ex : Mali" autocomplete="country-name" required></div>
+        <div class="ff"><label for="f-phone">📱 Ton numéro de contact <span>*</span></label><input type="tel" id="f-phone" placeholder="Ex : +223 70 00 00 00" autocomplete="tel" required></div>
+        <div class="ff"><label for="f-msg">✍️ Votre Demande <span>*</span></label><textarea id="f-msg" placeholder="Dis-nous ce que tu veux faire. Par exemple : je veux créer une boutique en ligne pour vendre mes produits..." required></textarea></div>
+        <button class="form-submit-btn" type="submit" id="contact-submit-btn">Envoyer ma demande</button>
         <div id="form-status" role="status" aria-live="polite" style="min-height:1.5em;margin-top:12px;font-size:.85rem;font-weight:600"></div>
         <div class="form-note">🔒 Données privées · <span>Réponse sous 2h</span></div>
+        </form>
       </div>
     </div>
   </div>
@@ -1539,6 +1542,8 @@ function demanderService(serviceName){
   }
 }
 
+const SUBMIT_BTN_LABEL='Envoyer ma demande';
+
 async function envoyerDemande(){
   const nom=document.getElementById('f-nom').value.trim();
   const email=document.getElementById('f-email').value.trim();
@@ -1547,6 +1552,7 @@ async function envoyerDemande(){
   const message=document.getElementById('f-msg').value.trim();
   const service=document.getElementById('f-service')?.value||'';
   const status=document.getElementById('form-status');
+  const btn=document.getElementById('contact-submit-btn');
   const fields=['f-nom','f-email','f-country','f-phone','f-msg'];
   let invalid=false;
   fields.forEach(id=>{
@@ -1561,11 +1567,10 @@ async function envoyerDemande(){
     status.style.color='#F87171';
     return;
   }
-  const btn=document.querySelector('.wa-btn');
-  const originalText=btn.textContent;
+  if(!btn) return;
   btn.disabled=true;
+  btn.classList.add('is-sending');
   btn.textContent='Envoi en cours...';
-  btn.style.background='#10B981';
   status.textContent='Envoi de votre demande...';
   status.style.color='#F8FAFC';
   try{
@@ -1574,13 +1579,24 @@ async function envoyerDemande(){
       headers:{'Content-Type':'application/json','Accept':'application/json'},
       body:JSON.stringify({fullName:nom,email,phone,country,message,service})
     });
-    const result=await response.json();
-    if(response.ok&&result.success){
+    let result={};
+    try{
+      result=await response.json();
+    }catch(parseError){
+      result={success:false,errors:['Réponse serveur invalide.']};
+    }
+    if(response.status===201&&result.success===true){
       status.textContent=result.message||'Votre demande a bien été envoyée. Notre équipe vous répondra rapidement.';
       status.style.color='#34D399';
       fields.forEach(id=>{const el=document.getElementById(id);el.value='';el.style.borderColor='';el.style.boxShadow='';});
       document.getElementById('f-service').value='';
       document.getElementById('f-service-wrap').style.display='none';
+    }else if(response.status===503){
+      status.textContent='Le service est temporairement indisponible. Veuillez réessayer dans quelques instants.';
+      status.style.color='#F87171';
+    }else if(response.status===400){
+      status.textContent=(result.errors&&result.errors.join(' '))||'Veuillez vérifier les informations saisies.';
+      status.style.color='#F87171';
     }else{
       status.textContent=(result.errors&&result.errors.join(' '))||result.message||'Impossible d’envoyer la demande.';
       status.style.color='#F87171';
@@ -1590,10 +1606,15 @@ async function envoyerDemande(){
     status.style.color='#F87171';
   }finally{
     btn.disabled=false;
-    btn.textContent=originalText;
-    btn.style.background='';
+    btn.classList.remove('is-sending');
+    btn.textContent=SUBMIT_BTN_LABEL;
   }
 }
+
+document.getElementById('contact-form')?.addEventListener('submit',function(e){
+  e.preventDefault();
+  envoyerDemande();
+});
 ['f-nom','f-email','f-country','f-phone','f-msg'].forEach(id=>{
   document.getElementById(id)?.addEventListener('input',function(){this.style.borderColor='';this.style.boxShadow='';});
 });
