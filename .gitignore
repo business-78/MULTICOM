@@ -15,3 +15,8 @@ tmp_*
 server_test_*.txt
 server_run_out.txt
 push_output.txt
+backups/
+backup_multicom_*.sql
+backup_multicom_*.sql.gz
+backup_multicom_*.dump
+backup_multicom_*.manifest.txt

@@ -1,0 +1,155 @@
+# Sauvegarde PostgreSQL MULTICOM (Neon) — stratégie 3-2-1
+# Copie automatisée hors Neon via pg_dump → artifact GitHub privé
+#
+# Secret requis : NEON_DATABASE_URL (endpoint DIRECT Neon, pas le pooler)
+# Ne jamais committer de secrets dans ce fichier.
+
+name: Database Backup
+
+on:
+  schedule:
+    # Quotidien à 03:15 UTC
+    - cron: '15 3 * * *'
+    # Hebdomadaire le dimanche à 04:00 UTC
+    - cron: '0 4 * * 0'
+    # Mensuel le 1er à 05:00 UTC
+    - cron: '0 5 1 * *'
+  workflow_dispatch:
+    inputs:
+      retention_label:
+        description: 'Étiquette de rétention (daily, weekly, monthly, manual)'
+        required: false
+        default: 'manual'
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Determine retention label
+        id: retention
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_LABEL: ${{ github.event.inputs.retention_label }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            LABEL="${MANUAL_LABEL:-manual}"
+          elif [ "$SCHEDULE" = "0 5 1 * *" ]; then
+            LABEL="monthly"
+          elif [ "$SCHEDULE" = "0 4 * * 0" ]; then
+            LABEL="weekly"
+          else
+            LABEL="daily"
+          fi
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+
+      - name: Create PostgreSQL backup
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${NEON_DATABASE_URL:-}" ]; then
+            echo "NEON_DATABASE_URL secret is not configured."
+            exit 1
+          fi
+
+          TIMESTAMP="$(date -u +%Y-%m-%d_%H%M%S)"
+          LABEL="${{ steps.retention.outputs.label }}"
+          BACKUP_DIR="backups"
+          SQL_FILE="${BACKUP_DIR}/backup_multicom_${LABEL}_${TIMESTAMP}.sql"
+          DUMP_FILE="${BACKUP_DIR}/backup_multicom_${LABEL}_${TIMESTAMP}.dump"
+          MANIFEST="${BACKUP_DIR}/backup_multicom_${LABEL}_${TIMESTAMP}.manifest.txt"
+
+          mkdir -p "$BACKUP_DIR"
+
+          # Dump SQL lisible (restauration simple via psql)
+          pg_dump "$NEON_DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --format=plain \
+            --file="$SQL_FILE"
+
+          # Dump custom (restauration via pg_restore)
+          pg_dump "$NEON_DATABASE_URL" \
+            --no-owner \
+            --no-acl \
+            --format=custom \
+            --file="$DUMP_FILE"
+
+          gzip -9 "$SQL_FILE"
+
+          {
+            echo "project=MULTICOM"
+            echo "label=$LABEL"
+            echo "created_utc=$TIMESTAMP"
+            echo "tables_expected=visitors,settings"
+            echo "sql_file=$(basename "${SQL_FILE}.gz")"
+            echo "dump_file=$(basename "$DUMP_FILE")"
+          } > "$MANIFEST"
+
+          # Vérification minimale sans exposer les données
+          if ! zgrep -q "CREATE TABLE.*visitors" "${SQL_FILE}.gz"; then
+            echo "Backup validation failed: visitors table not found in dump."
+            exit 1
+          fi
+          if ! zgrep -q "CREATE TABLE.*settings" "${SQL_FILE}.gz"; then
+            echo "Backup validation failed: settings table not found in dump."
+            exit 1
+          fi
+
+          echo "Backup created successfully."
+
+      - name: Set artifact retention days
+        id: artifact_retention
+        run: |
+          LABEL="${{ steps.retention.outputs.label }}"
+          case "$LABEL" in
+            monthly) DAYS=180 ;;
+            weekly) DAYS=28 ;;
+            daily|manual|*) DAYS=7 ;;
+          esac
+          echo "days=$DAYS" >> "$GITHUB_OUTPUT"
+
+      - name: Upload backup artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: multicom-db-${{ steps.retention.outputs.label }}-${{ github.run_id }}
+          path: backups/
+          retention-days: ${{ steps.artifact_retention.outputs.days }}
+          if-no-files-found: error
+
+      - name: Optional upload to S3-compatible storage
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.BACKUP_S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_S3_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.BACKUP_S3_REGION }}
+          BACKUP_S3_BUCKET: ${{ secrets.BACKUP_S3_BUCKET }}
+          BACKUP_S3_ENDPOINT: ${{ secrets.BACKUP_S3_ENDPOINT }}
+        run: |
+          set -euo pipefail
+          if [ -z "${BACKUP_S3_BUCKET:-}" ] || [ -z "${AWS_ACCESS_KEY_ID:-}" ] || [ -z "${AWS_SECRET_ACCESS_KEY:-}" ]; then
+            echo "Optional off-site S3 upload skipped (secrets not configured)."
+            exit 0
+          fi
+          pip install --quiet awscli
+          LABEL="${{ steps.retention.outputs.label }}"
+          for file in backups/*; do
+            KEY="multicom/${LABEL}/$(basename "$file")"
+            if [ -n "${BACKUP_S3_ENDPOINT:-}" ]; then
+              aws s3 cp "$file" "s3://${BACKUP_S3_BUCKET}/${KEY}" --endpoint-url "$BACKUP_S3_ENDPOINT"
+            else
+              aws s3 cp "$file" "s3://${BACKUP_S3_BUCKET}/${KEY}"
+            fi
+          done
+          echo "Off-site S3-compatible upload completed."

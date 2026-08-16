@@ -82,10 +82,28 @@ node -e "require('bcryptjs').hash('VotreMotDePasse', 10).then(console.log)"
 - `public/` — assets admin
 - `database/schema.sql` — schéma PostgreSQL
 
-## Sauvegarde (recommandation 3-2-1)
+## Sauvegarde 3-2-1
 
-1. **Neon** — base de production (activer les backups Neon si plan payant).
-2. **Export automatisé** — GitHub Action `pg_dump` vers stockage privé (non inclus, à configurer manuellement).
-3. **Copie hors ligne** — export CSV périodique via `/admin/export/excel`.
+Documentation complète : [`docs/BACKUP-3-2-1.md`](docs/BACKUP-3-2-1.md)
 
-Ne jamais committer de données visiteurs ou secrets dans Git.
+| Copie | Emplacement |
+|-------|-------------|
+| **#1 Production** | Neon PostgreSQL |
+| **#2 Automatisée** | GitHub Actions `pg_dump` → artifacts privés |
+| **#3 Hors site** | Téléchargement admin / script local / S3 optionnel |
+
+### Activation rapide
+
+1. Ajouter le secret GitHub `NEON_DATABASE_URL` (endpoint direct Neon).
+2. Pousser le workflow `.github/workflows/database-backup.yml`.
+3. Lancer manuellement l'action **Database Backup**.
+4. Télécharger l'artifact et conserver une copie hors ligne.
+
+### Backup local administrateur
+
+```powershell
+$env:NEON_DATABASE_URL = '<URL Neon directe>'
+.\scripts\backup_database.ps1
+```
+
+Ne jamais committer de dumps SQL ni de secrets dans Git.
